@@ -1,6 +1,6 @@
-streamlit
-matplotlib
-Pillow
-gdrive
+streamlit==1.41.1
+matplotlib==3.10.0
+Pillow==11.0.0
+gdrive==0.1.5
 tensorflow==2.18.0
-distutils
+setuptools
