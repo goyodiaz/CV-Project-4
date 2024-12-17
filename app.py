@@ -20,8 +20,8 @@ def random_image_from_folder(folder_path):
     return os.path.join(folder_path, random_image)
 
 # Убедитесь, что пути к папкам заданы до их использования
-content_folder = '/content/drive/My Drive/datasets/impressionist/training/training'
-style_folder = '/content/drive/My Drive/datasets/impressionist/validation/validation'
+content_folder = 'D:/OneDrive/Desktop/CV-Project-4/datasets/impressionist/training/training'
+style_folder = 'D:/OneDrive/Desktop/CV-Project-4/datasets/impressionist/validation/validation'
 
 # Загружаем случайные изображения
 content_image_path = random_image_from_folder(content_folder)
