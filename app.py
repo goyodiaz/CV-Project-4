@@ -50,9 +50,11 @@ def train_step(model, target_image, content_image, style_image, optimizer):
     target_image.assign(tf.clip_by_value(target_image, 0.0, 1.0))
     return loss
 
-# Пути к папкам с изображениями
-content_folder = 'D:/OneDrive/Desktop/CV-Project-4/datasets/impressionist/training/training'
-style_folder = 'D:/OneDrive/Desktop/CV-Project-4/datasets/impressionist/validation/validation'
+from google.colab import drive
+drive.mount('/content/drive')
+
+content_folder = '/content/drive/My Drive/datasets/impressionist/training/training'
+style_folder = '/content/drive/My Drive/datasets/impressionist/validation/validation'
 
 # Загружаем случайные изображения
 content_image_path = random_image_from_folder(content_folder)
