@@ -51,8 +51,8 @@ def train_step(model, target_image, content_image, style_image, optimizer):
     return loss
 
 # Пути к папкам с изображениями
-content_folder = 'D:\OneDrive\Desktop\CV-Project-4\datasets\impressionist\training\training'
-style_folder = 'D:\OneDrive\Desktop\CV-Project-4\datasets\impressionist\validation\validation'
+content_folder = 'D:/OneDrive/Desktop/CV-Project-4/datasets/impressionist/training/training'
+style_folder = 'D:/OneDrive/Desktop/CV-Project-4/datasets/impressionist/validation/validation'
 
 # Загружаем случайные изображения
 content_image_path = random_image_from_folder(content_folder)
@@ -66,8 +66,14 @@ style_image = load_image(style_image_path)
 st.image(content_image, caption="Content Image", use_column_width=True)
 st.image(style_image, caption="Style Image", use_column_width=True)
 
-# Загрузка модели
-# Вставьте вашу модель здесь (например, модель VGG или подобную)
+# Загрузка модели (например, VGG19, без верхнего слоя)
+def get_vgg_model():
+    vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
+    vgg.trainable = False
+    return vgg
+
+# Создание модели
+vgg_model = get_vgg_model()
 
 # Ваши переменные для оптимизации
 target_image = tf.Variable(content_image[tf.newaxis, ...], dtype=tf.float32)
@@ -76,7 +82,7 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=0.02)
 # Обучение и отображение
 epochs = 100
 for epoch in range(epochs):
-    loss = train_step(model, target_image, content_image[tf.newaxis, ...], style_image[tf.newaxis, ...], optimizer)
+    loss = train_step(vgg_model, target_image, content_image[tf.newaxis, ...], style_image[tf.newaxis, ...], optimizer)
     
     # Показать результат
     if (epoch + 1) % 10 == 0:
