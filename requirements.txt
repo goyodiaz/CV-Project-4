@@ -1,4 +1,4 @@
-Flask
+streamlit
 tensorflow
-numpy
+matplotlib
 Pillow
