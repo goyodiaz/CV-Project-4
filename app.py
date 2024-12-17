@@ -20,6 +20,9 @@ def random_image_from_folder(folder_path):
     random_image = random.choice(image_files)
     return os.path.join(folder_path, random_image)
 
+content_image_path = random_image_from_folder(content_folder)
+style_image_path = random_image_from_folder(style_folder)
+
 # Функция для вычисления лосса
 def compute_loss(model, target_image, content_image, style_image):
     target_outputs = model(target_image)
