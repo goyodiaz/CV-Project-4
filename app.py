@@ -20,42 +20,7 @@ def random_image_from_folder(folder_path):
     random_image = random.choice(image_files)
     return os.path.join(folder_path, random_image)
 
-content_image_path = random_image_from_folder(content_folder)
-style_image_path = random_image_from_folder(style_folder)
-
-# Функция для вычисления лосса
-def compute_loss(model, target_image, content_image, style_image):
-    target_outputs = model(target_image)
-    content_outputs = model(content_image)
-    style_outputs = model(style_image)
-    
-    # Потеря контента
-    content_loss = tf.reduce_mean((content_outputs[0] - target_outputs[0])**2)
-    
-    # Потеря стиля
-    style_loss = 0
-    for a, b in zip(style_outputs[1:], target_outputs[1:]):
-        gram_a = tf.linalg.einsum('bijc,bijd->bcd', a, a)
-        gram_b = tf.linalg.einsum('bijc,bijd->bcd', b, b)
-        style_loss += tf.reduce_mean((gram_a - gram_b)**2)
-    
-    # Общая потеря
-    loss = content_loss + 1e-4 * style_loss
-    return loss
-
-# Шаг оптимизации
-@tf.function
-def train_step(model, target_image, content_image, style_image, optimizer):
-    with tf.GradientTape() as tape:
-        loss = compute_loss(model, target_image, content_image, style_image)
-    grad = tape.gradient(loss, target_image)
-    optimizer.apply_gradients([(grad, target_image)])
-    target_image.assign(tf.clip_by_value(target_image, 0.0, 1.0))
-    return loss
-
-from google.colab import drive
-drive.mount('/content/drive')
-
+# Убедитесь, что пути к папкам заданы до их использования
 content_folder = '/content/drive/My Drive/datasets/impressionist/training/training'
 style_folder = '/content/drive/My Drive/datasets/impressionist/validation/validation'
 
@@ -68,8 +33,11 @@ content_image = load_image(content_image_path)
 style_image = load_image(style_image_path)
 
 # Визуализация выбранных изображений
-st.image(content_image, caption="Content Image", use_column_width=True)
-st.image(style_image, caption="Style Image", use_column_width=True)
+pil_content_image = Image.fromarray((content_image * 255).astype(np.uint8))
+pil_style_image = Image.fromarray((style_image * 255).astype(np.uint8))
+
+st.image(pil_content_image, caption="Content Image", use_column_width=True)
+st.image(pil_style_image, caption="Style Image", use_column_width=True)
 
 # Загрузка модели (например, VGG19, без верхнего слоя)
 def get_vgg_model():
@@ -92,13 +60,14 @@ for epoch in range(epochs):
     # Показать результат
     if (epoch + 1) % 10 == 0:
         st.write(f"Epoch {epoch+1}/{epochs}, Loss: {loss:.4f}")
-        st.image(target_image.numpy()[0], caption=f"Stylized Image at Epoch {epoch+1}", use_column_width=True)
+        pil_target_image = Image.fromarray((target_image.numpy()[0] * 255).astype(np.uint8))
+        st.image(pil_target_image, caption=f"Stylized Image at Epoch {epoch+1}", use_column_width=True)
 
 # Сохранение результата
 output_image = target_image.numpy()[0]
 output_image = np.clip(output_image, 0.0, 1.0)
 output_image = Image.fromarray((output_image * 255).astype(np.uint8))
-output_image.save('output_stylized_image.jpg')
+output_image.save('./static/output_stylized_image.jpg')
 
 # Показать результат
-st.image('output_stylized_image.jpg', caption="Final Stylized Image", use_column_width=True)
+st.image('./static/output_stylized_image.jpg', caption="Final Stylized Image", use_column_width=True)
