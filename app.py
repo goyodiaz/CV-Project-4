@@ -1,9 +1,11 @@
 import streamlit as st
 import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
-import os, random
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from PIL import Image
+# import os, random
+
+st.stop()
 
 # Функция для загрузки изображения
 def load_image(image_path, max_dim=512):
