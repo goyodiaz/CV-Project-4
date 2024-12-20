@@ -1,5 +1,5 @@
 import streamlit as st
-import setuptools
+from setuptools import setup
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -46,6 +46,38 @@ def get_vgg_model():
     vgg.trainable = False
     return vgg
 
+# Функция потерь
+def compute_loss(vgg_model, target_image, content_image, style_image):
+    # Вычисление потерь контента и стиля
+    content_weight = 1e3
+    style_weight = 1e-2
+    
+    content_layers = ['block5_conv2']  # Слой для извлечения признаков контента
+    style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1', 'block4_conv1', 'block5_conv1']  # Слои для стиля
+    
+    content_output = vgg_model(content_image)
+    style_output = vgg_model(style_image)
+    target_output = vgg_model(target_image)
+
+    content_loss = tf.reduce_mean((target_output - content_output) ** 2)
+    
+    style_loss = 0
+    for t, s in zip(target_output, style_output):
+        style_loss += tf.reduce_mean((t - s) ** 2)
+    
+    loss = content_weight * content_loss + style_weight * style_loss
+    return loss
+
+# Функция для выполнения одного шага оптимизации
+@tf.function
+def train_step(vgg_model, target_image, content_image, style_image, optimizer):
+    with tf.GradientTape() as tape:
+        loss = compute_loss(vgg_model, target_image, content_image, style_image)
+    
+    grads = tape.gradient(loss, target_image)
+    optimizer.apply_gradients([(grads, target_image)])
+    return loss
+
 # Создание модели
 vgg_model = get_vgg_model()
 
@@ -68,7 +100,13 @@ for epoch in range(epochs):
 output_image = target_image.numpy()[0]
 output_image = np.clip(output_image, 0.0, 1.0)
 output_image = Image.fromarray((output_image * 255).astype(np.uint8))
-output_image.save('./static/output_stylized_image.jpg')
+
+# Создаём директорию, если её нет
+output_dir = './static'
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+output_image.save(os.path.join(output_dir, 'output_stylized_image.jpg'))
 
 # Показать результат
-st.image('./static/output_stylized_image.jpg', caption="Final Stylized Image", use_column_width=True)
+st.image(os.path.join(output_dir, 'output_stylized_image.jpg'), caption="Final Stylized Image", use_column_width=True)
