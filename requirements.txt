@@ -3,4 +3,4 @@ tensorflow
 numpy
 matplotlib
 Pillow
-gdrive
+# gdrive
