@@ -1,6 +1,2 @@
 streamlit
 tensorflow 
-numpy
-matplotlib
-Pillow
-gdrive
